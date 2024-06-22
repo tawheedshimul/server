@@ -1,21 +1,16 @@
 const express = require("express");
 const cors = require("cors");
+const { MongoClient, ServerApiVersion } = require('mongodb');
+
 const app = express();
 const port = process.env.PORT || 7000;
 
-// middleware 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-
-
-// mongo code 
-
-
-const { MongoClient, ServerApiVersion } = require('mongodb');
+// MongoDB URI and Client
 const uri = "mongodb+srv://tawheedshimul:tawheedshimul@cluster0.ohlrycr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -24,64 +19,59 @@ const client = new MongoClient(uri, {
   }
 });
 
-async function run() {
+// Connect to MongoDB
+async function connectToMongoDB() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+    console.log("Successfully connected to MongoDB!");
 
+    const userCollection = client.db('USERDB').collection('users');
+    const categoriesCollection = client.db('USERDB').collection('categories');
+    const postCollection = client.db('USERDB').collection('posts');
 
-    const userCollection = client.db('USERDB').collection('users')
-
-    const categoriesCollection = client.db('USERDB').collection('categories')
-    const postCollection = client.db('USERDB').collection('posts')
-
-
+    // Routes
     app.get('/categories', async (req, res) => {
-      const LeftNav = categoriesCollection.find()
-      const result = await LeftNav.toArray();
-      res.send(result);
-    })
-
-
-    app.get('/posts', async (req, res) => {
-      const Posts = postCollection.find()
-      const result = await Posts.toArray();
-      res.send(result);
-    })
-
-
-
-    app.post('/users', async (req, res) => {
-      const user = req.body;
-      console.log('new user', user);
-      const result = await userCollection.insertOne(user);
-      res.send(result);
+      try {
+        const categories = await categoriesCollection.find().toArray();
+        res.send(categories);
+      } catch (error) {
+        res.status(500).send({ message: 'Failed to fetch categories', error });
+      }
     });
 
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
+    app.get('/posts', async (req, res) => {
+      try {
+        const posts = await postCollection.find().toArray();
+        res.send(posts);
+      } catch (error) {
+        res.status(500).send({ message: 'Failed to fetch posts', error });
+      }
+    });
+
+    app.post('/users', async (req, res) => {
+      try {
+        const user = req.body;
+        console.log('New user:', user);
+        const result = await userCollection.insertOne(user);
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: 'Failed to add user', error });
+      }
+    });
+
+    // Base route
+    app.get('/', (req, res) => {
+      res.send('Simple CRUD is running');
+    });
+
+  } catch (error) {
+    console.error('Failed to connect to MongoDB', error);
   }
 }
-run().catch(console.dir);
 
+connectToMongoDB().catch(console.error);
 
-
-
-
-
-
-
-app.get('/', (req, res) => {
-  res.send('Simple crud is running')
-});
-
-
+// Start server
 app.listen(port, () => {
-  console.log(`crud is running on ${port}`)
+  console.log(`CRUD is running on port ${port}`);
 });
-
-
