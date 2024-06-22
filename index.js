@@ -13,7 +13,8 @@ app.use(express.json());
 
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://tawheedshimul:tawheedshimul@cluster0.ohlrycr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = "mongodb+srv://tawheedhello:tawheedhello@cluster0.wrpiuoe.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -51,12 +52,12 @@ async function run() {
 
 
 
-    app.post('/users', async (req, res) => {
-      const user = req.body;
-      console.log('new user', user);
-      const result = await userCollection.insertOne(user);
-      res.send(result);
-    });
+    // app.post('/users', async (req, res) => {
+    //   const user = req.body;
+    //   console.log('new user', user);
+    //   const result = await userCollection.insertOne(user);
+    //   res.send(result);
+    // });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
