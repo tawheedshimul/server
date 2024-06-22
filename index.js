@@ -35,6 +35,7 @@ async function run() {
 
     const categoriesCollection = client.db('USERDB').collection('categories')
     const postCollection = client.db('USERDB').collection('posts')
+    const blogsCollection = client.db('USERDB').collection('blogs')
 
 
     app.get('/categories', async (req, res) => {
@@ -45,19 +46,34 @@ async function run() {
 
 
     app.get('/posts', async (req, res) => {
-      const Posts = postCollection.find()
-      const result = await Posts.toArray();
+      const posts = postCollection.find()
+      const result = await posts.toArray();
       res.send(result);
     })
 
 
 
-    // app.post('/users', async (req, res) => {
-    //   const user = req.body;
-    //   console.log('new user', user);
-    //   const result = await userCollection.insertOne(user);
-    //   res.send(result);
-    // });
+    app.post('/blogs', async (req, res) => {
+      const blogs = req.body;
+      console.log('new user', blogs);
+      const result = await blogsCollection.insertOne(blogs);
+      res.send(result);
+    });
+
+    app.get('/blogs', async (req, res) => {
+      const blogs = blogsCollection.find()
+      const result = await blogs.toArray();
+      res.send(result);
+    })
+
+
+
+    app.post('/posts', async (req, res) => {
+      const posts = req.body;
+      console.log('new user', posts);
+      const result = await userCollection.insertOne(user);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
